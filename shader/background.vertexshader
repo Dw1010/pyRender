@@ -1,0 +1,15 @@
+#version 330 core
+
+layout(location = 0) in vec3 vertexPosition_modelspace;
+layout(location = 1) in vec2 _MyUV;
+
+out vec2 UV;
+
+void main(){
+	gl_Position.x = vertexPosition_modelspace.x;
+	gl_Position.y = vertexPosition_modelspace.y;
+	gl_Position.z = 0.9999;
+
+	UV = _MyUV;
+}
+

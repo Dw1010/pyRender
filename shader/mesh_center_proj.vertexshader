@@ -1,0 +1,26 @@
+#version 330 core
+
+layout(location = 0) in vec3 vertexPosition_modelspace;
+layout(location = 1) in vec2 _MyUV;
+layout(location = 2) in vec3 _Mynormal;
+
+out vec2 UV;
+out vec3 Mynormal;
+out vec3 position;
+
+uniform mat4 MVP;
+
+void main(){
+    vec4 P;
+    P.xyz = vertexPosition_modelspace;
+	P.w = 1.0;
+    gl_Position = MVP * P;
+	gl_Position.x = gl_Position.x / gl_Position.z;
+	gl_Position.y = gl_Position.y / gl_Position.z;
+	gl_Position.z = gl_Position.z * 0.001;
+
+	position = vertexPosition_modelspace;
+    UV = _MyUV;
+	Mynormal = _Mynormal;
+}
+

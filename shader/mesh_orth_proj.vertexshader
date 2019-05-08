@@ -1,0 +1,27 @@
+#version 330 core
+
+layout(location = 0) in vec3 vertexPosition_modelspace;
+layout(location = 1) in vec2 _MyUV;
+layout(location = 2) in vec3 _Mynormal;
+
+out vec2 UV;
+out vec3 Mynormal;
+out vec3 position;
+
+uniform float Scale;
+uniform float U;
+uniform float V;
+uniform float Width;
+uniform float Height;
+
+void main(){
+   gl_Position.w = 1.0;
+	gl_Position.x = (Scale * vertexPosition_modelspace.x) / Width * 2 + U;
+	gl_Position.y = -(Scale * vertexPosition_modelspace.y) / Height * 2 - V;
+	gl_Position.z = vertexPosition_modelspace.z * 0.001;
+
+	position = vertexPosition_modelspace;
+    UV = _MyUV;
+	Mynormal = _Mynormal;
+}
+
