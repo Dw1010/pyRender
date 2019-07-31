@@ -1,17 +1,18 @@
 from OpenGL.GL import *
 from glfw.GLFW import *
-from common import shader
+from pyRender.common import shader
 import numpy as np
 import cv2 as cv
+import os
 
 
 class MeshRender:
     def __init__(self, center_proj=True):
         self.center_proj = center_proj
         if center_proj:
-            self.programID = shader.loadShaders('shader/mesh_center_proj.vertexshader', 'shader/mesh_center_proj.fragmentshader')
+            self.programID = shader.loadShaders(os.path.dirname(__file__) + '/shader/mesh_center_proj.vertexshader', os.path.dirname(__file__) + '/shader/mesh_center_proj.fragmentshader')
         else:
-            self.programID = shader.loadShaders('shader/mesh_orth_proj.vertexshader', 'shader/mesh_orth_proj.fragmentshader')
+            self.programID = shader.loadShaders(os.path.dirname(__file__) + '/shader/mesh_orth_proj.vertexshader', os.path.dirname(__file__) + '/shader/mesh_orth_proj.fragmentshader')
 
         self.VertexArrayID = glGenVertexArrays(1)
 
@@ -141,11 +142,31 @@ class MeshRender:
         camera[0, 2] = cameraIn[0, 2] * 2 / width - 1.0
         camera[1, 2] = -cameraIn[1, 2] * 2 / height + 1.0
         camera = np.matmul(camera, cameraEx)
+        # print(camera)
+
+        # cameraR = cameraEx[0:3, 0:3]
 
         glUseProgram(self.programID)
-        MatrixID = glGetUniformLocation(self.programID, "MVP")
-        glUniformMatrix4fv(MatrixID, 1, GL_FALSE, camera)
+        cameraInID = glGetUniformLocation(self.programID, "cameraIn")
+        glUniformMatrix3fv(cameraInID, 1, GL_FALSE, cameraIn.transpose())
+        rotationID = glGetUniformLocation(self.programID, "Rotation")
+        glUniformMatrix3fv(rotationID, 1, GL_FALSE, cameraEx[0:3, 0:3].transpose())
+        transID = glGetUniformLocation(self.programID, "Translation")
+        glUniform3f(transID, cameraEx[0, 3], cameraEx[1, 3], cameraEx[2, 3])
+        heightID = glGetUniformLocation(self.programID, "height")
+        glUniform1f(heightID, height)
+        widthID = glGetUniformLocation(self.programID, "width")
+        glUniform1f(widthID, width)
         glUseProgram(0)
+        # glUseProgram(self.programID)
+        # MatrixID = glGetUniformLocation(self.programID, "MVP")
+        # glUniformMatrix4fv(MatrixID, 1, GL_FALSE, camera)
+        # MatrixID2 = glGetUniformLocation(self.programID, "Rotation")
+        # glUniformMatrix3fv(MatrixID2, 1, GL_FALSE, cameraR)
+        # MatrixID3 = glGetUniformLocation(self.programID, "Translation")
+        # glUniform3f(MatrixID3, cameraEx[0, 3], cameraEx[1, 3], cameraEx[2, 3])
+        # glUseProgram(0)
+        return camera
 
     def set_camera_orth(self, scale, u, v, height, width):
         if self.center_proj:

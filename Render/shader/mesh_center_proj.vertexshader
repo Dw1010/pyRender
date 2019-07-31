@@ -1,0 +1,33 @@
+#version 330 core
+
+layout(location = 0) in vec3 vertexPosition_modelspace;
+layout(location = 1) in vec2 _MyUV;
+layout(location = 2) in vec3 _Mynormal;
+
+out vec2 UV;
+out vec3 Mynormal;
+out vec3 position;
+
+uniform mat3 cameraIn;
+uniform mat3 Rotation;
+uniform vec3 Translation;
+uniform float height;
+uniform float width;
+
+void main(){
+	position = Rotation * vertexPosition_modelspace + Translation;
+	UV = _MyUV;
+	Mynormal = Rotation * _Mynormal;
+
+	vec3 P = cameraIn * position;
+	gl_Position.x = (P.x / P.z) / width * 2 - 1;
+	gl_Position.y = -(P.y / P.z) / height * 2 + 1;
+	gl_Position.z = position.z * 0.001;
+	gl_Position.w = 1.0;
+	
+	//gl_Position.x = P.x / P.z;
+	//gl_Position.y = P.y / P.z;
+	//gl_Position.z = P.z * 0.0001;
+	//gl_Position.w = 1.0;
+}
+

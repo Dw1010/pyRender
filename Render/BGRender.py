@@ -1,8 +1,9 @@
 from OpenGL.GL import *
 from glfw.GLFW import *
-from common import shader
+from pyRender.common import shader
 import numpy as np
 import cv2 as cv
+import os
 
 
 class BGRender:
@@ -10,7 +11,7 @@ class BGRender:
         self.height = height
         self.width = width
 
-        self.programID = shader.loadShaders('shader/background.vertexshader', 'shader/background.fragmentshader')
+        self.programID = shader.loadShaders(os.path.dirname(__file__) + '/shader/background.vertexshader', os.path.dirname(__file__) + '/shader/background.fragmentshader')
         self.VertexArrayID = glGenVertexArrays(1)
         self.VertexBuffer = glGenBuffers(1)
         self.UvBuffer = glGenBuffers(1)
@@ -64,7 +65,7 @@ class BGRender:
         glBindVertexArray(0)
 
     def load_img(self, img):
-        self.BGimg = cv.resize(img, (self.height, self.width))
+        self.BGimg = cv.resize(img, (self.width, self.height))
         self.BGimg = cv.flip(self.BGimg, 0)
 
     def bind_texture(self):
