@@ -23,7 +23,7 @@ class MeshRender:
         self.height = 8
         self.width = 8
 
-    def load_data(self, vertex, face, uv=None, TextureImg=None):
+    def load_data(self, vertex, face, uv=None, faceUV=None, TextureImg=None):
         self.faceNum = np.size(face, 0)
         vertexNum = np.size(vertex, 0)
         vertex3 = np.zeros((3 * self.faceNum, 3), dtype='float32')
@@ -48,20 +48,21 @@ class MeshRender:
             normal3[3 * idx + 0, :] = normal[face[idx, 0], :]
             normal3[3 * idx + 1, :] = normal[face[idx, 1], :]
             normal3[3 * idx + 2, :] = normal[face[idx, 2], :]
-        if uv is None or TextureImg is None:
+        if uv is None or TextureImg is None or faceUV is None:
             self.TextureImg = np.ones((8, 8, 3), dtype='uint8') * 128
             self.height = 8
             self.width = 8
             uv = np.zeros((np.size(vertex, 0), 2), dtype='float32')
+            faceUV = face
         else:
             self.TextureImg = cv.flip(TextureImg, 0)
             self.height = np.size(TextureImg, 0)
             self.width = np.size(TextureImg, 1)
         uv3 = np.zeros((3 * self.faceNum, 2), dtype='float32')
         for idx in range(self.faceNum):
-            uv3[3 * idx + 0, :] = uv[face[idx, 0], :]
-            uv3[3 * idx + 1, :] = uv[face[idx, 1], :]
-            uv3[3 * idx + 2, :] = uv[face[idx, 2], :]
+            uv3[3 * idx + 0, :] = uv[faceUV[idx, 0], :]
+            uv3[3 * idx + 1, :] = uv[faceUV[idx, 1], :]
+            uv3[3 * idx + 2, :] = uv[faceUV[idx, 2], :]
 
         # print(vertex3)
         # print(uv3)
