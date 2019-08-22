@@ -16,8 +16,8 @@ uniform float Height;
 
 void main(){
    gl_Position.w = 1.0;
-	gl_Position.x = (Scale * vertexPosition_modelspace.x + U) / Width * 2;
-	gl_Position.y = -(Scale * vertexPosition_modelspace.y + V) / Height * 2;
+	gl_Position.x = (Scale * vertexPosition_modelspace.x + U) / Width * 2-1;
+	gl_Position.y = -(Scale * vertexPosition_modelspace.y + V) / Height * 2+1;
 	gl_Position.z = vertexPosition_modelspace.z * 0.001;
 
 	position = vertexPosition_modelspace;
