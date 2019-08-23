@@ -27,28 +27,18 @@ class MeshRender:
     def load_data(self, vertex, face, uv=None, faceUV=None, TextureImg=None):
         self.faceNum = np.size(face, 0)
         vertexNum = np.size(vertex, 0)
-        vertex3 = np.zeros((3 * self.faceNum, 3), dtype='float32')
+
         normal = np.zeros((vertexNum, 3), dtype='float32')
-        normal3 = np.zeros((3 * self.faceNum, 3), dtype='float32')
-        for idx in range(self.faceNum):
-            vertex3[3 * idx + 0, :] = vertex[face[idx, 0], :]
-            vertex3[3 * idx + 1, :] = vertex[face[idx, 1], :]
-            vertex3[3 * idx + 2, :] = vertex[face[idx, 2], :]
-            v1 = vertex[face[idx, 1], :] - vertex[face[idx, 0], :]
-            v2 = vertex[face[idx, 2], :] - vertex[face[idx, 1], :]
-            n = np.array([v1[1] * v2[2] - v1[2] * v2[1],
-                          v1[2] * v2[0] - v1[0] * v2[2],
-                          v1[0] * v2[1] - v1[1] * v2[0]],
-                         dtype='float32')
-            normal[face[idx, 0], :] += n
-            normal[face[idx, 1], :] += n
-            normal[face[idx, 2], :] += n
-        for i in range(vertexNum):
-            normal[i, :] /= np.linalg.norm(normal[i, :])
-        for idx in range(self.faceNum):
-            normal3[3 * idx + 0, :] = normal[face[idx, 0], :]
-            normal3[3 * idx + 1, :] = normal[face[idx, 1], :]
-            normal3[3 * idx + 2, :] = normal[face[idx, 2], :]
+        tris = vertex[face]
+        n = np.cross(tris[:, 1, :] - tris[:, 0, :], tris[:, 2, :] - tris[:, 1, :])
+        normal[face[:, 0]] += n
+        normal[face[:, 1]] += n
+        normal[face[:, 2]] += n
+        normalize_v3(normal)
+
+        vertex3 = vertex[face]
+        normal3 = normal[face]
+
         if uv is None or TextureImg is None or faceUV is None:
             self.TextureImg = np.ones((8, 8, 3), dtype='uint8') * 128
             self.height = 8
@@ -59,11 +49,47 @@ class MeshRender:
             self.TextureImg = cv.flip(TextureImg, 0)
             self.height = np.size(TextureImg, 0)
             self.width = np.size(TextureImg, 1)
-        uv3 = np.zeros((3 * self.faceNum, 2), dtype='float32')
-        for idx in range(self.faceNum):
-            uv3[3 * idx + 0, :] = uv[faceUV[idx, 0], :]
-            uv3[3 * idx + 1, :] = uv[faceUV[idx, 1], :]
-            uv3[3 * idx + 2, :] = uv[faceUV[idx, 2], :]
+        uv3 = uv[faceUV]
+
+        # self.faceNum = np.size(face, 0)
+        # vertexNum = np.size(vertex, 0)
+        # vertex3 = np.zeros((3 * self.faceNum, 3), dtype='float32')
+        # normal = np.zeros((vertexNum, 3), dtype='float32')
+        # normal3 = np.zeros((3 * self.faceNum, 3), dtype='float32')
+        # for idx in range(self.faceNum):
+        #     vertex3[3 * idx + 0, :] = vertex[face[idx, 0], :]
+        #     vertex3[3 * idx + 1, :] = vertex[face[idx, 1], :]
+        #     vertex3[3 * idx + 2, :] = vertex[face[idx, 2], :]
+        #     v1 = vertex[face[idx, 1], :] - vertex[face[idx, 0], :]
+        #     v2 = vertex[face[idx, 2], :] - vertex[face[idx, 1], :]
+        #     n = np.array([v1[1] * v2[2] - v1[2] * v2[1],
+        #                   v1[2] * v2[0] - v1[0] * v2[2],
+        #                   v1[0] * v2[1] - v1[1] * v2[0]],
+        #                  dtype='float32')
+        #     normal[face[idx, 0], :] += n
+        #     normal[face[idx, 1], :] += n
+        #     normal[face[idx, 2], :] += n
+        # for i in range(vertexNum):
+        #     normal[i, :] /= np.linalg.norm(normal[i, :])
+        # for idx in range(self.faceNum):
+        #     normal3[3 * idx + 0, :] = normal[face[idx, 0], :]
+        #     normal3[3 * idx + 1, :] = normal[face[idx, 1], :]
+        #     normal3[3 * idx + 2, :] = normal[face[idx, 2], :]
+        # if uv is None or TextureImg is None or faceUV is None:
+        #     self.TextureImg = np.ones((8, 8, 3), dtype='uint8') * 128
+        #     self.height = 8
+        #     self.width = 8
+        #     uv = np.zeros((np.size(vertex, 0), 2), dtype='float32')
+        #     faceUV = face
+        # else:
+        #     self.TextureImg = cv.flip(TextureImg, 0)
+        #     self.height = np.size(TextureImg, 0)
+        #     self.width = np.size(TextureImg, 1)
+        # uv3 = np.zeros((3 * self.faceNum, 2), dtype='float32')
+        # for idx in range(self.faceNum):
+        #     uv3[3 * idx + 0, :] = uv[faceUV[idx, 0], :]
+        #     uv3[3 * idx + 1, :] = uv[faceUV[idx, 1], :]
+        #     uv3[3 * idx + 2, :] = uv[faceUV[idx, 2], :]
 
         # print(vertex3)
         # print(uv3)
