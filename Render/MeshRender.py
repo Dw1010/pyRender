@@ -6,6 +6,14 @@ import cv2 as cv
 import os
 
 
+def normalize_v3(arr):
+    lens = np.sqrt(arr[:, 0]**2 + arr[:, 1]**2 + arr[:, 2]**2)
+    arr[:, 0] /= lens
+    arr[:, 1] /= lens
+    arr[:, 2] /= lens
+    return arr
+
+
 class MeshRender:
     def __init__(self, center_proj=True):
         self.center_proj = center_proj
