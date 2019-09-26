@@ -39,9 +39,13 @@ class MeshRender:
         normal = np.zeros((vertexNum, 3), dtype='float32')
         tris = vertex[face]
         n = np.cross(tris[:, 1, :] - tris[:, 0, :], tris[:, 2, :] - tris[:, 1, :])
-        normal[face[:, 0]] += n
-        normal[face[:, 1]] += n
-        normal[face[:, 2]] += n
+        for idx in range(self.faceNum):
+            normal[face[idx, 0], :] += n[idx]
+            normal[face[idx, 1], :] += n[idx]
+            normal[face[idx, 2], :] += n[idx]
+        # normal[face[:, 0]] += n
+        # normal[face[:, 1]] += n
+        # normal[face[:, 2]] += n
         normalize_v3(normal)
 
         vertex3 = vertex[face]
@@ -58,6 +62,10 @@ class MeshRender:
             self.height = np.size(TextureImg, 0)
             self.width = np.size(TextureImg, 1)
         uv3 = uv[faceUV]
+
+        vertex3 = vertex3.astype('float32')
+        normal3 = normal3.astype('float32')
+        uv3 = uv3.astype('float32')
 
         # self.faceNum = np.size(face, 0)
         # vertexNum = np.size(vertex, 0)
@@ -77,6 +85,7 @@ class MeshRender:
         #     normal[face[idx, 0], :] += n
         #     normal[face[idx, 1], :] += n
         #     normal[face[idx, 2], :] += n
+        # # print(normal)
         # for i in range(vertexNum):
         #     normal[i, :] /= np.linalg.norm(normal[i, :])
         # for idx in range(self.faceNum):
@@ -98,10 +107,10 @@ class MeshRender:
         #     uv3[3 * idx + 0, :] = uv[faceUV[idx, 0], :]
         #     uv3[3 * idx + 1, :] = uv[faceUV[idx, 1], :]
         #     uv3[3 * idx + 2, :] = uv[faceUV[idx, 2], :]
+        # # print(vertex3)
+        # # print(uv3)
+        # # print(normal3)
 
-        # print(vertex3)
-        # print(uv3)
-        # print(normal3)
         glBindVertexArray(self.VertexArrayID)
         glBindBuffer(GL_ARRAY_BUFFER, self.VertexBuffer)
         glBufferData(GL_ARRAY_BUFFER, vertex3.nbytes, vertex3, GL_DYNAMIC_DRAW)
