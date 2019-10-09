@@ -32,6 +32,12 @@ class MeshRender:
         self.height = 8
         self.width = 8
 
+        weight = np.zeros((9, 3), dtype='float32')
+        weight[0, 0] = 1
+        weight[0, 1] = 1
+        weight[0, 2] = 1
+        self.set_SH_lighting(weight)
+
     def load_data(self, vertex, face, uv=None, faceUV=None, TextureImg=None):
         self.faceNum = np.size(face, 0)
         vertexNum = np.size(vertex, 0)
@@ -171,6 +177,19 @@ class MeshRender:
         glUniform1i(self.TextureID, 1)
         glUseProgram(0)
         glBindVertexArray(0)
+
+    def set_SH_lighting(self, weight):
+        weight = weight.astype('float32')
+        # weight : 9*3
+        glUseProgram(self.programID)
+        TempFloatID = glGetUniformLocation(self.programID, "SHweight_R")
+        glUniform1fv(TempFloatID, 9, weight[:, 0])
+        TempFloatID = glGetUniformLocation(self.programID, "SHweight_G")
+        glUniform1fv(TempFloatID, 9, weight[:, 1])
+        TempFloatID = glGetUniformLocation(self.programID, "SHweight_B")
+        glUniform1fv(TempFloatID, 9, weight[:, 2])
+        glUseProgram(0)
+        pass
 
     def set_camera_center(self, cameraIn, cameraEx, height, width):
         if not self.center_proj:
