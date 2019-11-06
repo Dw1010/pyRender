@@ -1,9 +1,12 @@
 from OpenGL.GL import *
 from glfw.GLFW import *
-from pyRender.common import shader
 import numpy as np
 import cv2 as cv
 import os
+
+import sys
+sys.path.append('../../')
+from ..common.shader import loadShaders
 
 
 def normalize_v3(arr):
@@ -18,9 +21,9 @@ class MeshRender:
     def __init__(self, center_proj=True):
         self.center_proj = center_proj
         if center_proj:
-            self.programID = shader.loadShaders(os.path.dirname(__file__) + '/shader/mesh_center_proj.vertexshader', os.path.dirname(__file__) + '/shader/mesh_center_proj.fragmentshader')
+            self.programID = loadShaders(os.path.dirname(__file__) + '/shader/mesh_center_proj.vertexshader', os.path.dirname(__file__) + '/shader/mesh_center_proj.fragmentshader')
         else:
-            self.programID = shader.loadShaders(os.path.dirname(__file__) + '/shader/mesh_orth_proj.vertexshader', os.path.dirname(__file__) + '/shader/mesh_orth_proj.fragmentshader')
+            self.programID = loadShaders(os.path.dirname(__file__) + '/shader/mesh_orth_proj.vertexshader', os.path.dirname(__file__) + '/shader/mesh_orth_proj.fragmentshader')
 
         self.VertexArrayID = glGenVertexArrays(1)
 
