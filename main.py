@@ -1,16 +1,22 @@
-from common import shader
-from common import GLInit
-from OpenGL.GL import *
-from glfw.GLFW import *
+
 import numpy as np
 import cv2 as cv
-from Render.BGRender import BGRender
-from Render.MeshRender import MeshRender
+
+import sys
+sys.path.append('../')
+
+from OpenGL.GL import *
+from glfw.GLFW import *
+from pyRender.common import myGLInit
+from pyRender.Render import BGRender
+from pyRender.Render import MeshRender
 
 
 if __name__ == '__main__':
-    window = GLInit.myGLInit(320, 320)
-    backGround = BGRender(320, 320)
+    img_size = 320
+
+    window = myGLInit(img_size, img_size)
+    backGround = BGRender(img_size, img_size)
     mesh = MeshRender(center_proj=False)
     mesh2 = MeshRender(center_proj=True)
 
@@ -43,7 +49,7 @@ if __name__ == '__main__':
             face[i, 2] = faceList[i][2]
 
         mesh.load_data(vertex=vertex, face=face, uv=None, TextureImg=None)
-        mesh.set_camera_orth(scale=1, u=0, v=0, height=320, width=320)
+        mesh.set_camera_orth(scale=1, u=0, v=0, height=img_size, width=img_size)
         mesh.draw()
 
         # cameraIn = np.identity(3, dtype='float32')
@@ -53,8 +59,18 @@ if __name__ == '__main__':
         # cameraIn[1, 1] = 100
         # cameraEx = np.identity(4, dtype='float32')
         # mesh2.load_data(vertex=vertex, face=face, uv=None, TextureImg=None)
-        # mesh2.set_camera_center(cameraIn=cameraIn, cameraEx=cameraEx, height=320, width=320)
+        # mesh2.set_camera_center(cameraIn=cameraIn, cameraEx=cameraEx, height=img_size, width=img_size)
         # mesh2.draw()
+
+        data = glReadPixels(0, 0, img_size, img_size, GL_BGRA, GL_FLOAT, outputType=None)
+        data = data.reshape(img_size, img_size, -1)
+        data = np.flip(data, 0)
+        img = (255 * data[..., :3]).astype(np.uint8)
+        mask = (255 - 255 * data[..., 3:]).astype(np.uint8)
+
+        data = glReadPixels(0, 0, img_size, img_size, GL_DEPTH_COMPONENT, GL_FLOAT, outputType=None)
+        z = data.reshape(img_size, img_size)
+        z = np.flip(z, 0)
 
         glfwSwapBuffers(window)
         glfwPollEvents()

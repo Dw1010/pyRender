@@ -17,6 +17,23 @@ def normalize_v3(arr):
     return arr
 
 
+def compute_normal(vertices, faces):
+    norm = np.zeros(vertices.shape, dtype=vertices.dtype)
+    tris = vertices[faces]
+    n = np.cross(tris[::, 1] - tris[::, 0], tris[::, 2] - tris[::, 0])
+    normalize_v3(n)
+    norm[faces[:, 0]] += n
+    norm[faces[:, 1]] += n
+    norm[faces[:, 2]] += n
+    # for idx in range(faces.shape[0]):
+    #     norm[faces[idx, 0], :] += n[idx]
+    #     norm[faces[idx, 1], :] += n[idx]
+    #     norm[faces[idx, 2], :] += n[idx]
+    normalize_v3(norm)
+
+    return norm
+
+
 class MeshRender:
     def __init__(self, center_proj=True):
         self.center_proj = center_proj
@@ -43,19 +60,8 @@ class MeshRender:
 
     def load_data(self, vertex, face, uv=None, faceUV=None, TextureImg=None):
         self.faceNum = np.size(face, 0)
-        vertexNum = np.size(vertex, 0)
 
-        normal = np.zeros((vertexNum, 3), dtype='float32')
-        tris = vertex[face]
-        n = np.cross(tris[:, 1, :] - tris[:, 0, :], tris[:, 2, :] - tris[:, 1, :])
-        for idx in range(self.faceNum):
-            normal[face[idx, 0], :] += n[idx]
-            normal[face[idx, 1], :] += n[idx]
-            normal[face[idx, 2], :] += n[idx]
-        # normal[face[:, 0]] += n
-        # normal[face[:, 1]] += n
-        # normal[face[:, 2]] += n
-        normalize_v3(normal)
+        normal = compute_normal(vertex, face)
 
         vertex3 = vertex[face]
         normal3 = normal[face]
